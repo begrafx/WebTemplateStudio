@@ -26,8 +26,7 @@ import buttonStyles from "../../css/buttonStyles.module.css";
 import {
   EXTENSION_COMMANDS,
   EXTENSION_MODULES,
-  WIZARD_CONTENT_INTERNAL_NAMES,
-  INTL_MESSAGES
+  WIZARD_CONTENT_INTERNAL_NAMES
 } from "../../utils/constants";
 import styles from "./styles.module.css";
 import { Dispatch } from "redux";
@@ -166,7 +165,7 @@ const AzureFunctionsResourceModal = (props: Props) => {
       runtimeStack: [
         {
           value: "node",
-          label: "node"
+          label: "JavaScript"
         }
       ],
       subscription: props.subscriptions,
@@ -190,14 +189,14 @@ const AzureFunctionsResourceModal = (props: Props) => {
     updateForm(updatedFunctionsForm);
   };
 
-  const handleDropdown = (infoLabel: string, value: string) => {
+  const handleDropdown = (infoLabel: string, option: IDropDownOptionType) => {
     // Send command to extension on change
     // Populate resource groups on received commands
     let updatedForm = {
       ...azureFunctionsFormData,
       [infoLabel]: {
-        value: value,
-        label: value
+        value: option.value,
+        label: option.label
       }
     };
     if (infoLabel === FORM_CONSTANTS.SUBSCRIPTION.value) {
@@ -210,7 +209,7 @@ const AzureFunctionsResourceModal = (props: Props) => {
         module: EXTENSION_MODULES.AZURE,
         command: EXTENSION_COMMANDS.SUBSCRIPTION_DATA_FUNCTIONS,
         track: true,
-        subscription: value
+        subscription: option.value
       });
       updatedForm = {
         ...updatedForm,
@@ -227,7 +226,7 @@ const AzureFunctionsResourceModal = (props: Props) => {
    * Listens on account name change and validates the input in VSCode
    */
   React.useEffect(() => {
-    if (azureFunctionsFormData.appName.value != "") {
+    if (azureFunctionsFormData.appName.value !== "") {
       if (timeout) {
         clearTimeout(timeout);
       }
@@ -242,7 +241,7 @@ const AzureFunctionsResourceModal = (props: Props) => {
         });
       }, 700);
     }
-  }, [azureFunctionsFormData.appName]);
+  }, [azureFunctionsFormData.appName.value]);
 
   React.useEffect(() => {
     if (props.selection) {
@@ -326,7 +325,7 @@ const AzureFunctionsResourceModal = (props: Props) => {
           ariaLabel={ariaLabel}
           options={options}
           handleChange={option => {
-            handleDropdown(formSectionId, option.value);
+            handleDropdown(formSectionId, option);
           }}
           value={
             azureFunctionsFormData[formSectionId].value
